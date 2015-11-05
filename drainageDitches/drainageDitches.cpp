@@ -21,29 +21,31 @@ int augment(vector<vector<int> > &cap, int s, int t, vector<int> &p)
     for(int v = t; v != s; v = p[v])
     {
         int u = p[v];
+        //cout<< "["<< u<< "]["<< v<< "] : "<< cap[u][v]<< " -> "<< cap[u][v] - bottleNeck<< endl;
         cap[u][v] -= bottleNeck;
         cap[v][u] += bottleNeck;
     }
     return bottleNeck;
 }
 
-int bfs(vector<vector<int> > &cap, int s, int t, vector<int> &p, vector<bool> visited)
+int dfs(vector<vector<int> > &cap, int s, int t, vector<int> &p, vector<bool> &visited)
 {
     if(s == t)
     {
         return augment(cap, 1, n, p);
     }
 
-    vector<bool> curVisited = visited;
-    curVisited[s] = true;
-    int flow;
+    visited[s] = true;
+    int flow = 0;
 
-    for(int i = 0; i <= n; i++)
+    for(int i = 1; i <= n; i++)
     {
-        if(cap[s][i] > 0 && !curVisited[i])
+        //cout<< "cur cap["<< s<< "]["<< i<< "] = "<< cap[s][i]<< ", visited["<< i<< "] = "<< visited[i]<< endl;
+        if(cap[s][i] > 0 && !visited[i])
         {
             p[i] = s;
-            if((flow = bfs(cap, i, t, p, curVisited)) > 0)
+            //cout<< "enter"<< endl;
+            if((flow = dfs(cap, i, t, p, visited)) > 0)
                 return flow;
             else continue;
 
@@ -70,9 +72,11 @@ int main()
 		int flow, max_flow = 0;
 		vector<bool> visited(n + 1);
 		vector<int> p(n + 1);
-		while((flow = bfs(cap, 1, n, p, visited)) > 0)
+		while((flow = dfs(cap, 1, n, p, visited)) > 0)
 		{
 			max_flow += flow;
+			//visited.clear();
+			fill(visited.begin(), visited.end(), 0);
 		}
 		cout << max_flow << endl;
 	}
